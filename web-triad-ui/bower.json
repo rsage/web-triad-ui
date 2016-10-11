@@ -13,7 +13,6 @@
     },
     "license": "MIT",
     "homepage": "https://github.com/rsage/web-triad-ui/web-triad-ui",
-    "private": true,
     "ignore": [
         "**/.*",
         "*.*",

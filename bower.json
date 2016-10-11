@@ -2,8 +2,8 @@
     "name": "web-triad-ui",
     "description": "ui controls",
     "main": [
-        "Content/uiControls/Css/tcStyle.css",
-        "Content/uiControls/Scripts/reviewControl.js"
+        "dist/uiControls/Css/tcStyle.css",
+        "dist/uiControls/Scripts/reviewControl.js"
     ],
     "authors": [
         "acrsm"
@@ -12,10 +12,9 @@
         "web-triad-sdk-for-js": "0.0.13"
     },
     "license": "MIT",
-    "homepage": "https://github.com/rsage/web-triad-ui/web-triad-ui",
+    "homepage": "https://github.com/rsage/web-triad-ui",
     "ignore": [
         "**/.*",
-        "*.*",
         "node_modules",
         "bower_components",
         "packages",

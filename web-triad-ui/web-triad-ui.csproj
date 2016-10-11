@@ -141,7 +141,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy $(ProjectDir)Content\uiControls $(SolutionDir)distr /E /I /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy $(ProjectDir)Content\uiControls $(SolutionDir)dist\uiControls /E /I /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

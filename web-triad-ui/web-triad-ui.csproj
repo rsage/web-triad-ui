@@ -80,14 +80,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="uiControls\Css\tcStyle.css" />
-    <Content Include="uiControls\Images\close16.png" />
-    <Content Include="uiControls\Images\close20.png" />
-    <Content Include="uiControls\Images\image.png" />
-    <Content Include="uiControls\Images\minus.png" />
-    <Content Include="uiControls\Images\plus.png" />
-    <Content Include="uiControls\Scripts\reviewControl.js" />
-    <Content Include="uiControls\Scripts\webTriadService.js" />
+    <Content Include="Content\uiControls\Css\tcStyle.css" />
+    <Content Include="Content\uiControls\Images\close16.png" />
+    <Content Include="Content\uiControls\Images\close20.png" />
+    <Content Include="Content\uiControls\Images\image.png" />
+    <Content Include="Content\uiControls\Images\minus.png" />
+    <Content Include="Content\uiControls\Images\plus.png" />
+    <Content Include="Content\uiControls\Scripts\reviewControl.js" />
+    <Content Include="Content\uiControls\Scripts\webTriadService.js" />
     <Content Include="Global.asax" />
     <Content Include="gulpfile.js" />
     <Content Include="package.json" />
@@ -103,7 +103,6 @@
   <ItemGroup>
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
-    <Content Include="bower.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -113,7 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\" />
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
   </ItemGroup>
@@ -142,6 +140,9 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(ProjectDir)Content\uiControls $(SolutionDir)distr /E /I /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

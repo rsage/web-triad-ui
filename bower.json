@@ -18,17 +18,7 @@
         "*.*",
         "node_modules",
         "bower_components",
-        "test",
-        "tests",
-        "App_Data",
-        "App_Start",
-        "bin",
-        "Content",
-        "Controllers",
-        "Models",
-        "node_modules",
-        "obj",
-        "Properties",
-        "Views"
+        "packages",
+        "web-triad-ui"
     ]
 }

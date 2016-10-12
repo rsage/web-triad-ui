@@ -1,11 +1,4 @@
-﻿
-$.ajaxSetup({
-    beforeSend: function (xhr) {
-        xhr.setRequestHeader("Authorization", "QUIC");
-    }
-});
-
-(function ($, window, document, undefined) {
+﻿(function ($, window, document, undefined) {
     $.widget("acr.reviewerSubmittedFiles", {
         options: {
             reviewData: null,
@@ -15,13 +8,20 @@ $.ajaxSetup({
                 sizeChunk: 1024 * 1024 * 2,
                 numberOfConnection: 6
             }
-
         },
 
         /////////////////////////////////////////////////////////////////////////
 
         _create: function () {
+            this.update(this.options);
+        },
+
+        /////////////////////////////////////////////////////////////////////////
+
+        update: function (options) {
             let self = this;
+
+            $.extend(self.options, options);
 
             var studies_E = $(self._studies_T);
 
@@ -30,12 +30,24 @@ $.ajaxSetup({
             var deferred1 = $.Deferred();
             $.when(self._getStudiesAndSeriesDetailsDef()).then(function (data) {
 
+                if (data.length === 0) {
+                    self.element.html("no files");
+                    return;
+                }
+
                 var tbody = studies_E.find("tbody");
 
                 for (let i = 0; i < data.length; i++) {
+
+                    var isExpanded = self._dictionaryStateOfCollapse[data[i].Metadata.DicomDataStudyID];
+                    if (isExpanded === undefined) {
+                        self._dictionaryStateOfCollapse[data[i].Metadata.DicomDataStudyID] = true;
+                        isExpanded = true;
+                    }
+                    var str = isExpanded === true ? "tc-expanded" : "";
                     tbody.append(
                         "<tr data-study-id='" + data[i].Metadata.DicomDataStudyID + "'>" +
-                        "<td><span class='tc-collapse'></span></td>" +
+                        "<td><span class='tc-collapse " + str + "'></span></td>" +
                         "<td>" + data[i].Metadata.DicomDataStudyID + "</td>" +
                         "<td>" + data[i].Metadata.StudyDescription + "</td>" +
                         "<td style='text-align: center;'>" + data[i].Metadata.StudyDate + "</td>" +
@@ -46,6 +58,7 @@ $.ajaxSetup({
                     );
 
                     var series_E = $(self._series_T);
+                    isExpanded === true ? series_E.find(".tc-series").show() : series_E.find(".tc-series").hide();
                     var tbodySeries = series_E.find("tbody");
 
 
@@ -69,11 +82,7 @@ $.ajaxSetup({
 
             $.when(deferred1).then(function () {
                 self.element.html(studies_E);
-
                 self._bindEvent();
-
-
-
             });
         },
 
@@ -140,25 +149,25 @@ $.ajaxSetup({
                     alert(data.message);
                     return;
                 }
-                if (data.length > 0) {
-                    for (let i = 0; i < data.length; i++) {
-                        data[i].Metadata = self._arrayOfNameValueToDictionary(data[i].Metadata);
-                        deferreds.push(self._getSeriesDetailsDef(data[i].Metadata.DicomDataStudyID));
-                    }
-                    $.when.apply($, deferreds).done(function () {
-                        $.each(arguments, function (j, series) {
-                            for (let i = 0; i < data.length; i++) {
-                                if (data[i].Metadata.DicomDataStudyID === series.DicomDataStudyID) {
-                                    data[i].Metadata.Series = series;
-                                    continue;
-                                }
+                //if (data.length > 0) {
+                for (let i = 0; i < data.length; i++) {
+                    data[i].Metadata = self._arrayOfNameValueToDictionary(data[i].Metadata);
+                    deferreds.push(self._getSeriesDetailsDef(data[i].Metadata.DicomDataStudyID));
+                }
+                $.when.apply($, deferreds).done(function () {
+                    $.each(arguments, function (j, series) {
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].Metadata.DicomDataStudyID === series.DicomDataStudyID) {
+                                data[i].Metadata.Series = series;
+                                continue;
                             }
                         }
-                        );
-                        deferred.resolve(data);
-                    });
+                    }
+                    );
+                    deferred.resolve(data);
+                });
 
-                }
+                //}
             }
 
             return deferred.promise();
@@ -173,8 +182,11 @@ $.ajaxSetup({
             $(".tc-collapse").each(function () {
                 var that = $(this);
                 that.click(function () {
-                    that.toggleClass("tc-expand");
+                    that.toggleClass("tc-expanded");
+                    self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")] =
+                        !self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")];
                     that.closest("tr").next().find(".tc-series").slideToggle(100);
+
                 });
             });
 
@@ -216,7 +228,7 @@ $.ajaxSetup({
                             alert(data.message);
                             return;
                         } else {
-                            self._create();
+                            self.update();
                         }
                     }
                 });
@@ -234,17 +246,11 @@ $.ajaxSetup({
                             alert(data.message);
                             return;
                         } else {
-                            self._create();
+                            self.update();
                         }
                     }
                 });
             });
-
-
-
-
-
-
         },
 
         /////////////////////////////////////////////////////////////////////////
@@ -275,6 +281,7 @@ $.ajaxSetup({
                 "<tbody></tbody>" +
                 "</table>" +
                 "</div>",
+
         _series_T:
             "<tr><td colspan='7'>" +
                 "<div class='tc-series'>" +
@@ -290,6 +297,8 @@ $.ajaxSetup({
                 "<tbody></tbody>" +
                 "</table>" +
                 "</div" +
-                "</td></tr>"
+                "</td></tr>",
+
+        _dictionaryStateOfCollapse: {}
     });
 })(jQuery, window, document);

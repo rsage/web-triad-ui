@@ -29,7 +29,6 @@
 }
 
 .tc-table-study > tbody{
-    /*background-color: #eafff4;*/
     color: #666666
 }
 
@@ -46,16 +45,16 @@
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url(../Images/minus.png);
+    background-image: url(../Images/plus.png);
     margin: auto;
     cursor: pointer;     
 }
 
-.tc-table-study > tbody > tr > td > span.tc-collapse.tc-expand {
+.tc-table-study > tbody > tr > td > span.tc-expanded {
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url(../Images/plus.png);
+    background-image: url(../Images/minus.png);
     margin: auto;
     cursor: pointer;     
 }

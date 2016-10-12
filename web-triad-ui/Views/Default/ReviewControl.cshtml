@@ -12,7 +12,14 @@
 </div>
 
 <script>
-    var bb = $("#reviewControl").reviewerSubmittedFiles({
+    
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "QUIC");
+        }
+    });
+
+    var reviewControl = $("#reviewControl").reviewerSubmittedFiles({
         reviewData: [
             { Name: "ExamId", Value: "" },
             { Name: "FileGroup", Value: "" },
@@ -21,6 +28,11 @@
             { Name: "TimepointId", Value: "" }
         ]
     });
+
+    var timerId = setInterval(function() {
+        reviewControl.reviewerSubmittedFiles("update");
+    }, 3000);
+
 </script>
 
 

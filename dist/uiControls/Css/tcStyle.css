@@ -227,8 +227,8 @@ span.tc-delete-series {
 /*.tc-table-study > tbody > tr:nth-child(4n+4),*/
 .tc-table-study > tbody > tr:nth-child(4n+3)
  {
-    background-color: #eafff4;
-    /*background-color: #daf5e7;*/
+    /*background-color: #eafff4;*/
+    background-color: #daf5e7;
 }
 .tc-table-series > tbody > tr:nth-child(2n+1) {
     background-color: white;
@@ -272,7 +272,7 @@ span.tc-delete-series {
 }
 
 
-.progress-bar {
+.tc-progress-bar {
         background-color: white;
         -moz-border-radius: 2px;
         -webkit-border-radius: 2px;
@@ -282,7 +282,7 @@ span.tc-delete-series {
         box-shadow: 3px 3px 8px -4px #000000;
 }
 
-.progress-bar span {
+.tc-progress-bar span {
         display: block;
         -moz-border-radius: 1px;
         -webkit-border-radius: 1px;
@@ -293,19 +293,19 @@ span.tc-delete-series {
         background-color: #73a0af;
 }
 
-.progress-bar.tc-progress-parsing {
+.tc-progress-bar.tc-progress-parsing {
         height: 15px;
         width: 80%;
         margin-left: auto;
         margin-right: auto;
 }
 
-.progress-bar.tc-progress-parsing span {
+.tc-progress-bar.tc-progress-parsing span {
         height: 15px;
         width: 0;
 }
 
-.progress-bar.tc-progress-uploading {
+.tc-progress-bar.tc-progress-uploading {
     height: 10px;
     width: 50%;
     margin-left: auto;
@@ -314,7 +314,7 @@ span.tc-delete-series {
     bottom: 4px;
 }
 
-.progress-bar.tc-progress-uploading span {
+.tc-progress-bar.tc-progress-uploading span {
     height: 10px;
     width: 0;      
 }

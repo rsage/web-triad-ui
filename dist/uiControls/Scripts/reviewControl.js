@@ -1,4 +1,4 @@
-﻿(function ($, window, document, undefined) {
+﻿(function($, window, document, undefined) {
     $.widget("acr.reviewerSubmittedFiles", {
         options: {
             reviewData: null,
@@ -12,14 +12,16 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _create: function () {
+        _create: function() {
             this.update(this.options);
         },
 
         /////////////////////////////////////////////////////////////////////////
 
-        update: function (options) {
+        update: function(options) {
             let self = this;
+            var spinner_E = $(self._spinner_T);
+            self.element.html(spinner_E);
 
             $.extend(self.options, options);
 
@@ -28,7 +30,7 @@
             self._service = new WebTriadService(self.options.serviceParam);
 
             var deferred1 = $.Deferred();
-            $.when(self._getStudiesAndSeriesDetailsDef()).then(function (data) {
+            $.when(self._getStudiesDetailsDef()).then(function(data) {
 
                 if (data.length === 0) {
                     self.element.html("no files");
@@ -61,16 +63,15 @@
                     isExpanded === true ? series_E.find(".tc-series").show() : series_E.find(".tc-series").hide();
                     var tbodySeries = series_E.find("tbody");
 
-
-                    for (let j = 0; j < data[i].Metadata.Series.length; j++) {
+                    for (let j = 0; j < data[i].Series.length; j++) {
                         tbodySeries.append(
                             "<tr for-data-study-id='" + data[i].Metadata.DicomDataStudyID +
-                            "' data-series-id='" + data[i].Metadata.Series[j].Metadata.SeriesId + "'>" +
+                            "' data-series-id='" + data[i].Series[j].Metadata.SeriesId + "'>" +
                             "<td></td>" +
-                            "<td>" + data[i].Metadata.Series[j].Metadata.SeriesDescription + "</td>" +
-                            "<td style='text-align: center;'>" + data[i].Metadata.Series[j].Metadata.Modality + "</td>" +
-                            "<td style='text-align: center;'>" + data[i].Metadata.Series[j].Metadata.SeriesNumber + "</td>" +
-                            "<td style='text-align: center;'>" + data[i].Metadata.Series[j].Metadata.NoOfObjects + "</td>" +
+                            "<td>" + data[i].Series[j].Metadata.SeriesDescription + "</td>" +
+                            "<td style='text-align: center;'>" + data[i].Series[j].Metadata.Modality + "</td>" +
+                            "<td style='text-align: center;'>" + data[i].Series[j].Metadata.SeriesNumber + "</td>" +
+                            "<td style='text-align: center;'>" + data[i].Series[j].Metadata.NoOfObjects + "</td>" +
                             "<td style='text-align: center;'><span class='tc-delete-series'></span></td>" +
                             "</tr>"
                         );
@@ -80,7 +81,7 @@
                 deferred1.resolve().promise();
             });
 
-            $.when(deferred1).then(function () {
+            $.when(deferred1).then(function() {
                 self.element.html(studies_E);
                 self._bindEvent();
             });
@@ -88,19 +89,23 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getStudiesDetailsDef: function () {
+        _getStudiesDetailsDef: function() {
             let self = this;
             var deferred = $.Deferred();
             self._service.getStudiesDetails(self.options.reviewData, callback);
 
             function callback(data) {
                 if (data.status === ProcessStatus.Error) {
-                    alert(data.message);
+                    //alert(data.message);
+                    console.log(data.message);
                     return;
                 }
                 if (data.length > 0) {
                     for (let i = 0; i < data.length; i++) {
                         data[i].Metadata = self._arrayOfNameValueToDictionary(data[i].Metadata);
+                        for (var j = 0; j < data[i].Series.length; j++) {
+                            data[i].Series[j].Metadata = self._arrayOfNameValueToDictionary(data[i].Series[j].Metadata);
+                        }
                     }
                 }
                 deferred.resolve(data);
@@ -111,7 +116,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getSeriesDetailsDef: function (studyId) {
+        _getSeriesDetailsDef: function(studyId) {
             let self = this;
             var deferred = $.Deferred();
             var params = [{ Name: "DicomDataStudyID", "Value": studyId }];
@@ -120,7 +125,8 @@
 
             function callback(data) {
                 if (data.status === ProcessStatus.Error) {
-                    alert(data.message);
+                    //alert(data.message);
+                    console.log(data.message);
                     return;
                 }
                 if (data.length > 0) {
@@ -132,56 +138,22 @@
                 }
                 deferred.resolve(data);
             }
-            return deferred.promise();
-        },
-
-        /////////////////////////////////////////////////////////////////////////
-
-        _getStudiesAndSeriesDetailsDef: function () {
-            let self = this;
-            var deferred = $.Deferred();
-            self._service.getStudiesDetails(self.options.reviewData, callback);
-
-            var deferreds = [];
-
-            function callback(data) {
-                if (data.status === ProcessStatus.Error) {
-                    alert(data.message);
-                    return;
-                }
-                //if (data.length > 0) {
-                for (let i = 0; i < data.length; i++) {
-                    data[i].Metadata = self._arrayOfNameValueToDictionary(data[i].Metadata);
-                    deferreds.push(self._getSeriesDetailsDef(data[i].Metadata.DicomDataStudyID));
-                }
-                $.when.apply($, deferreds).done(function () {
-                    $.each(arguments, function (j, series) {
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i].Metadata.DicomDataStudyID === series.DicomDataStudyID) {
-                                data[i].Metadata.Series = series;
-                                continue;
-                            }
-                        }
-                    }
-                    );
-                    deferred.resolve(data);
-                });
-
-                //}
-            }
 
             return deferred.promise();
         },
 
         /////////////////////////////////////////////////////////////////////////
 
-        _bindEvent: function () {
+
+        /////////////////////////////////////////////////////////////////////////
+
+        _bindEvent: function() {
             var self = this;
             ///////////////////////////////////////
 
-            $(".tc-collapse").each(function () {
+            self.element.find(".tc-collapse").each(function() {
                 var that = $(this);
-                that.click(function () {
+                that.click(function() {
                     that.toggleClass("tc-expanded");
                     self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")] =
                         !self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")];
@@ -192,9 +164,9 @@
 
             ///////////////////////////////////////
 
-            $(".tc-open-image").each(function () {
+            self.element.find(".tc-open-image").each(function() {
                 var that = $(this);
-                that.click(function () {
+                that.click(function() {
 
                     var studyId =
                     {
@@ -208,7 +180,8 @@
 
                     function callback(data) {
                         if (data.status === ProcessStatus.Error) {
-                            alert(data.message);
+                            //alert(data.message);
+                            console.log(data.message);
                             return;
                         }
                     }
@@ -217,15 +190,17 @@
 
             ///////////////////////////////////////
 
-            $(".tc-delete-study").each(function () {
+            self.element.find(".tc-delete-study").each(function() {
                 var that = $(this);
-                that.click(function () {
+                that.click(function() {
                     var studyId = that.closest("tr").attr("data-study-id");
 
                     self._service.deleteStudy(studyId, callback);
+
                     function callback(data) {
                         if (data.status === ProcessStatus.Error) {
-                            alert(data.message);
+                            //alert(data.message);
+                            console.log(data.message);
                             return;
                         } else {
                             self.update();
@@ -236,14 +211,16 @@
 
             ///////////////////////////////////////
 
-            $(".tc-delete-series").each(function () {
+            self.element.find(".tc-delete-series").each(function() {
                 var that = $(this);
-                that.click(function () {
+                that.click(function() {
                     var seriesId = that.closest("tr").attr("data-series-id");
                     self._service.deleteSeries(seriesId, callback);
+
                     function callback(data) {
                         if (data.status === ProcessStatus.Error) {
-                            alert(data.message);
+                            //alert(data.message);
+                            console.log(data.message);
                             return;
                         } else {
                             self.update();
@@ -255,7 +232,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _arrayOfNameValueToDictionary: function (data) {
+        _arrayOfNameValueToDictionary: function(data) {
             var result = {};
             for (let i = 0; i < data.length; i++) {
                 result[data[i].Name] = data[i].Value;
@@ -264,6 +241,11 @@
         },
 
         /////////////////////////////////////////////////////////////////////////
+
+        _spinner_T:
+            "<div class='tc-spinner'>" +
+                "<div class='tc-loader'></div>" +
+                "</div>",
 
         _studies_T:
             "<div class='tc-wrapper'>" +
@@ -276,7 +258,7 @@
                 "<th style='width: 200px; text-align: center'>Study Date</th>" +
                 "<th style='width: 200px; text-align: center'>Study Size</th>" +
                 "<th style='width: 100px; text-align: center'>Image</th>" +
-                "<th class='tc-action-th'>Action</th>" +
+                "<th style='width: 100px; text-align: center' class='tc-action-th'>Action</th>" +
                 "</tr></thead>" +
                 "<tbody></tbody>" +
                 "</table>" +
@@ -292,11 +274,11 @@
                 "<th style='width: 150px; text-align: center'>Modality</th>" +
                 "<th style='width: 150px; text-align: center'>Series Number</th>" +
                 "<th style='width: 250px; text-align: center'>No. of Files</th>" +
-                "<th class='tc-action-th'></th>" +
+                "<th style='width: 100px; text-align: center' class='tc-action-th'></th>" +
                 "</tr></thead>" +
                 "<tbody></tbody>" +
                 "</table>" +
-                "</div" +
+                "</div>" +
                 "</td></tr>",
 
         _dictionaryStateOfCollapse: {}

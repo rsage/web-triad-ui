@@ -19,5 +19,10 @@ namespace web_triad_ui.Controllers
         {
             return View();
         }
+
+        public ActionResult UploadControl()
+        {
+            return View();
+        }
     }
 }

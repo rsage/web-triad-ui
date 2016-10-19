@@ -1,4 +1,4 @@
-﻿(function($, window, document, undefined) {
+﻿(function ($, window, document, undefined) {
     $.widget("acr.uploaderFiles", {
         options: {
             uploadData: null,
@@ -28,15 +28,27 @@
             }
         },
         /////////////////////////////////////////////////////////////////////////
-
-        _create: function() {
+        _destroy: function () {
             let self = this;
+            self._studies = {};
+            self._filesProcessing = {};
+            self._studiesUploading = {};
+            self._dictionaryStateOfCollapse = {};
+            self._checkAvailabilityStatusAddingFiles();
+            self.element.html("");
+        },
+        _create: function () {
+            let self = this;
+            self._studies = {};
+            self._filesProcessing = {};
+            self._studiesUploading = {};
+            self._dictionaryStateOfCollapse = {};
             self._checkAvailabilityStatusAddingFiles();
             var studies_E = $(self._studies_T);
             self.element.html(studies_E);
         },
 
-        addFiles: function(files) {
+        addFiles: function (files) {
             let self = this;
 
             self.element.find(".tc-parsingPanel").show();
@@ -79,9 +91,9 @@
             }
 
 
-            var processingFiles = $.when.apply($, deferreds).done(function() {
+            var processingFiles = $.when.apply($, deferreds).done(function () {
                 var deferred = $.Deferred();
-                $.each(arguments, function(i, data) {
+                $.each(arguments, function (i, data) {
                     if (!self._studies.hasOwnProperty(data.studyInstanceUid)) {
                         self._studies[data.studyInstanceUid] = {
                             series: {}
@@ -129,20 +141,20 @@
                         self.element.find(".tc-parsingPanel").hide();
                     }
                 });
-               
+
             });
 
             function callback(guidOfSet) {
                 var progressParsing = $(".tc-table-parsingPanel tr[data-fileset-uid='" + guidOfSet + "'] .tc-parsing-progress span");
                 var val = self._filesProcessing[guidOfSet];
-                var width = ++val.processed/val.quantity*100;
-                progressParsing.width(width + "%");              
+                var width = ++val.processed / val.quantity * 100;
+                progressParsing.width(width + "%");
             };
         },
 
         /////////////////////////////////////////////////////////////////////////
 
-        _update: function() {
+        _update: function () {
             let self = this;
 
             self._service = new WebTriadService(self.options.serviceParam);
@@ -179,7 +191,7 @@
                     );
 
                     var progressBar_E = $(self._progressBar_T).addClass("tc-progress-uploading");
-                    self.element.find("tr[data-study-uid='" + studyUid + "']"+ " .tc-actions-td").append(progressBar_E);
+                    self.element.find("tr[data-study-uid='" + studyUid + "']" + " .tc-actions-td").append(progressBar_E);
 
                     var series_E = $(self._series_T);
                     isExpanded === true ? series_E.find(".tc-series").show() : series_E.find(".tc-series").hide();
@@ -244,13 +256,13 @@
             }
         },
 
-       _bindEvent: function() {
+        _bindEvent: function () {
             var self = this;
             ///////////////////////////////////////
 
             self.element.find(".tc-collapse").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
                     that.toggleClass("tc-expanded");
                     self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-uid")] =
                         !self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-uid")];
@@ -259,9 +271,9 @@
                 });
             });
 
-            self.element.find(".tc-delete-study").each(function() {
+            self.element.find(".tc-delete-study").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
                     self._delete_study_bind(that);
                 });
             });
@@ -282,14 +294,14 @@
 
                 var deleteStudyBtns = that.siblings(".tc-delete-study");
                 var deleteSeriesBtns = trStudy.next("tr").find(".tc-delete-series");
-                             
+
                 that.click(function () {
                     self._studiesUploading[studyUid] = true;
                     self._checkAvailabilityStatusAddingFiles();
                     that.hide();
                     cancelBtn.show();
                     trStudy.find(".tc-progress-uploading").show();
-                   
+
                     deleteStudyBtns.each(function () {
                         $(this).unbind('click');
                         $(this).addClass("not-allowed");
@@ -299,9 +311,9 @@
                         $(this).addClass("not-allowed");
                     });
 
-                  
+
                     var series = self._studies[studyUid].series;
-                    var files = []; 
+                    var files = [];
                     for (let seriesId in series) {
                         if (series.hasOwnProperty(seriesId)) {
                             files = files.concat(series[seriesId].files);
@@ -348,16 +360,16 @@
                 function uploadHandler(result) {
                     trStudy.attr("data-listOfFilesId", result.listOfFilesId);
                     switch (result.status) {
-                    case ProcessStatus.Success:
-                        updateProgress(result.progress);
-                        break;
-                    case ProcessStatus.InProgress:
-                        updateProgress(result.progress);
-                        break;
-                    case ProcessStatus.Error:
-                        updateProgress(result.progress);
-                        break;
-                    default:
+                        case ProcessStatus.Success:
+                            updateProgress(result.progress);
+                            break;
+                        case ProcessStatus.InProgress:
+                            updateProgress(result.progress);
+                            break;
+                        case ProcessStatus.Error:
+                            updateProgress(result.progress);
+                            break;
+                        default:
                     }
                 }
 
@@ -399,7 +411,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _arrayOfNameValueToDictionary: function(data) {
+        _arrayOfNameValueToDictionary: function (data) {
             var result = {};
             for (let i = 0; i < data.length; i++) {
                 result[data[i].Name] = data[i].Value;
@@ -407,7 +419,7 @@
             return result;
         },
 
-        _getSizeOfListFiles: function(list) {
+        _getSizeOfListFiles: function (list) {
             let size = 0;
             for (let i = 0; i < list.length; i++) {
                 size += list[i].size;
@@ -417,7 +429,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getGuid: function() {
+        _getGuid: function () {
             function s4() {
                 return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
             }
@@ -428,7 +440,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getDicomInfoFromFileDef: function(file, callback) {
+        _getDicomInfoFromFileDef: function (file, callback) {
             var reader = new FileReader();
             var deferred = $.Deferred();
             var data = {
@@ -443,12 +455,12 @@
                 modality: "failed",
                 seriesNumber: "failed"
             }
-            reader.onload = function() {
+            reader.onload = function () {
                 var blob = reader.result;
                 var arr = new Uint8Array(blob);
                 try {
                     var bb = console.log;
-                    console.log = function() {}
+                    console.log = function () { }
                     var decoder = decoder_new(arr);
                     var instance = decoder_readSopInstance(decoder, file.name);
                     console.log = bb;
@@ -483,7 +495,7 @@
             } else {
                 reader.readAsArrayBuffer(file);
             }
-            
+
             return deferred.promise();
         },
 
@@ -533,9 +545,9 @@
                 "</table>" +
                 "</div>" +
                 "</td></tr>",
-        
+
         _progressBar_T:
-            "<div class='progress-bar' style='display: none;'>" +
+            "<div class='tc-progress-bar' style='display: none;'>" +
                 "<span></span>" +
                 "</div>",
 

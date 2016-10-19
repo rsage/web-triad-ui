@@ -1,4 +1,4 @@
-﻿(function($, window, document, undefined) {
+﻿(function ($, window, document, undefined) {
     $.widget("acr.reviewerSubmittedFiles", {
         options: {
             reviewData: null,
@@ -12,16 +12,16 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _create: function() {
+        _create: function () {
             this.update(this.options);
         },
 
         /////////////////////////////////////////////////////////////////////////
 
-        update: function(options) {
+        update: function (options) {
             let self = this;
-            var spinner_E = $(self._spinner_T);
-            self.element.html(spinner_E);
+            //var spinner_E = $(self._spinner_T);
+            //self.element.html(spinner_E);
 
             $.extend(self.options, options);
 
@@ -30,7 +30,7 @@
             self._service = new WebTriadService(self.options.serviceParam);
 
             var deferred1 = $.Deferred();
-            $.when(self._getStudiesDetailsDef()).then(function(data) {
+            $.when(self._getStudiesDetailsDef()).then(function (data) {
 
                 if (data.length === 0) {
                     self.element.html("no files");
@@ -81,7 +81,7 @@
                 deferred1.resolve().promise();
             });
 
-            $.when(deferred1).then(function() {
+            $.when(deferred1).then(function () {
                 self.element.html(studies_E);
                 self._bindEvent();
             });
@@ -89,7 +89,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getStudiesDetailsDef: function() {
+        _getStudiesDetailsDef: function () {
             let self = this;
             var deferred = $.Deferred();
             self._service.getStudiesDetails(self.options.reviewData, callback);
@@ -116,7 +116,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _getSeriesDetailsDef: function(studyId) {
+        _getSeriesDetailsDef: function (studyId) {
             let self = this;
             var deferred = $.Deferred();
             var params = [{ Name: "DicomDataStudyID", "Value": studyId }];
@@ -147,13 +147,13 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _bindEvent: function() {
+        _bindEvent: function () {
             var self = this;
             ///////////////////////////////////////
 
-            self.element.find(".tc-collapse").each(function() {
+            self.element.find(".tc-collapse").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
                     that.toggleClass("tc-expanded");
                     self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")] =
                         !self._dictionaryStateOfCollapse[that.closest("tr").attr("data-study-id")];
@@ -164,9 +164,9 @@
 
             ///////////////////////////////////////
 
-            self.element.find(".tc-open-image").each(function() {
+            self.element.find(".tc-open-image").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
 
                     var studyId =
                     {
@@ -190,9 +190,9 @@
 
             ///////////////////////////////////////
 
-            self.element.find(".tc-delete-study").each(function() {
+            self.element.find(".tc-delete-study").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
                     var studyId = that.closest("tr").attr("data-study-id");
 
                     self._service.deleteStudy(studyId, callback);
@@ -211,9 +211,9 @@
 
             ///////////////////////////////////////
 
-            self.element.find(".tc-delete-series").each(function() {
+            self.element.find(".tc-delete-series").each(function () {
                 var that = $(this);
-                that.click(function() {
+                that.click(function () {
                     var seriesId = that.closest("tr").attr("data-series-id");
                     self._service.deleteSeries(seriesId, callback);
 
@@ -232,7 +232,7 @@
 
         /////////////////////////////////////////////////////////////////////////
 
-        _arrayOfNameValueToDictionary: function(data) {
+        _arrayOfNameValueToDictionary: function (data) {
             var result = {};
             for (let i = 0; i < data.length; i++) {
                 result[data[i].Name] = data[i].Value;

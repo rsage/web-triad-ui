@@ -47,13 +47,14 @@
                         isExpanded = true;
                     }
                     var str = isExpanded === true ? "tc-expanded" : "";
+                    var size = Math.round((data[i].Metadata.StudySize / (1024 * 1024)) * 100) / 100;
                     tbody.append(
                         "<tr data-study-id='" + data[i].Metadata.DicomDataStudyID + "'>" +
                         "<td><span class='tc-collapse " + str + "'></span></td>" +
                         "<td>" + data[i].Metadata.DicomDataStudyID + "</td>" +
                         "<td>" + data[i].Metadata.StudyDescription + "</td>" +
                         "<td style='text-align: center;'>" + data[i].Metadata.StudyDate + "</td>" +
-                        "<td style='text-align: center;'>" + data[i].Metadata.StudySize / (1024 * 1024) + "mb </td>" +
+                        "<td style='text-align: center;'>" + size + "mb </td>" +
                         "<td><span class='tc-open-image'></span></td>" +
                         "<td style='text-align: center;'><span class='tc-delete-study'></span></td>" +
                         "</tr>"

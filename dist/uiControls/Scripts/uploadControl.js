@@ -19,58 +19,43 @@
 
         _studiesUploading: {},
 
-        _checkAvailabilityStatusAddingFiles: function () {
-            let self = this;
-            if (Object.keys(self._studiesUploading).length === 0) {
-                self.options.setAvailabilityStatusAddingFiles(true);
-            } else {
-                self.options.setAvailabilityStatusAddingFiles(false);
-            }
-        },
+        _dictionaryStateOfCollapse: {},
+
         /////////////////////////////////////////////////////////////////////////
-        _destroy: function () {
-            let self = this;
-            self._studies = {};
-            self._filesProcessing = {};
-            self._studiesUploading = {};
-            self._dictionaryStateOfCollapse = {};
-            self._checkAvailabilityStatusAddingFiles();
-            self.element.html("");
-        },
+
         _create: function () {
-            let self = this;
-            self._studies = {};
-            self._filesProcessing = {};
-            self._studiesUploading = {};
-            self._dictionaryStateOfCollapse = {};
-            self._checkAvailabilityStatusAddingFiles();
-            var studies_E = $(self._studies_T);
-            self.element.html(studies_E);
+            this._studies = {};
+            this._filesProcessing = {};
+            this._studiesUploading = {};
+            this._dictionaryStateOfCollapse = {};
+            this._checkAvailabilityStatusAddingFiles();
+            var studies_E = $(this._studies_T);
+            this.element.html(studies_E);
         },
+
+        /////////////////////////////////////////////////////////////////////////
+
+        _destroy: function () {
+            this.element.html("");
+        },
+
+        /////////////////////////////////////////////////////////////////////////
 
         addFiles: function (files) {
             let self = this;
-
             self.element.find(".tc-parsingPanel").show();
-
             var guidOfFileset = self._getGuid();
-
             self._filesProcessing[guidOfFileset] = {
                 quantity: files.length,
                 processed: 0
             };
-
             var count = files.length > 4 ? 3 : files.length;
             var filesNames = files[0].name;
             for (let i = 1; i < count; i++) {
                 filesNames += ", " + files[i].name;
             }
-
             var progressBar_E = $(self._progressBar_T).addClass("tc-progress-parsing").show();
-
-
             var parsingPanel = self.element.find(".tc-parsingPanel tbody");
-
             parsingPanel.append(
                 "<tr data-fileset-uid='" + guidOfFileset + "'>" +
                 "<td style='padding-left: 15px;'><div style='text-overflow: ellipsis;overflow: hidden;width: 300px;white-space: nowrap;'>" +
@@ -81,16 +66,11 @@
                 "</tr>"
             );
             parsingPanel.find("tr[data-fileset-uid='" + guidOfFileset + "']> td.tc-parsing-progress").append(progressBar_E);
-
-
             var deferreds = [];
-
             for (let i = 0; i < files.length; i++) {
                 files[i].guidOfFileset = guidOfFileset;
                 deferreds.push(self._getDicomInfoFromFileDef(files[i], callback));
             }
-
-
             var processingFiles = $.when.apply($, deferreds).done(function () {
                 var deferred = $.Deferred();
                 $.each(arguments, function (i, data) {
@@ -108,13 +88,11 @@
                     self._studies[data.studyInstanceUid]["StudyDescription"] = data.studyDescription;
                     self._studies[data.studyInstanceUid]["StudyDate"] = data.studyDate;
                     self._studies[data.studyInstanceUid]["StudyId"] = data.studyId;
-
                     self._studies[data.studyInstanceUid].series[data.seriesNumber]["SeriesDescription"] = data.seriesDescription;
                     self._studies[data.studyInstanceUid].series[data.seriesNumber]["Modality"] = data.modality;
                     self._studies[data.studyInstanceUid].series[data.seriesNumber]["SeriesNumber"] = data.seriesNumber;
                     self._studies[data.studyInstanceUid].series[data.seriesNumber].files.push(data.file);
                 });
-
                 for (let studyUid in self._studies) {
                     if (self._studies.hasOwnProperty(studyUid)) {
                         var studySize = 0;
@@ -129,9 +107,7 @@
                 deferred.resolve();
                 return deferred.promise();
             });
-
             $.when(processingFiles).done(function () {
-
                 self._update();
                 var parsingTr = parsingPanel.find("tr[data-fileset-uid='" + guidOfFileset + "']");
                 parsingTr.fadeOut(600, function () {
@@ -141,7 +117,6 @@
                         self.element.find(".tc-parsingPanel").hide();
                     }
                 });
-
             });
 
             function callback(guidOfSet) {
@@ -156,16 +131,11 @@
 
         _update: function () {
             let self = this;
-
             self._service = new WebTriadService(self.options.serviceParam);
-
             self.element.find(".tc-wrapper").show();
-
             var studies = self._studies;
-
             var tbodyStudy = self.element.find(".tc-table-study tbody");
             tbodyStudy.html("");
-
             for (let studyUid in studies) {
                 if (studies.hasOwnProperty(studyUid)) {
                     var isExpanded = self._dictionaryStateOfCollapse[studies[studyUid]["StudyInstanceUid"]];
@@ -174,7 +144,6 @@
                         isExpanded = true;
                     }
                     var str = isExpanded === true ? "tc-expanded" : "";
-
                     var size = Math.round((studies[studyUid]["StudySize"] / (1024 * 1024)) * 100) / 100;
                     tbodyStudy.append(
                         "<tr data-study-uid='" + studyUid + "'>" +
@@ -189,14 +158,11 @@
                         "<span class='tc-delete-study'></span></td>" +
                         "</tr>"
                     );
-
                     var progressBar_E = $(self._progressBar_T).addClass("tc-progress-uploading");
                     self.element.find("tr[data-study-uid='" + studyUid + "']" + " .tc-actions-td").append(progressBar_E);
-
                     var series_E = $(self._series_T);
                     isExpanded === true ? series_E.find(".tc-series").show() : series_E.find(".tc-series").hide();
                     var tbodySeries = series_E.find("tbody");
-
                     var series = studies[studyUid].series;
                     for (let seriesId in series) {
                         if (series.hasOwnProperty(seriesId)) {
@@ -216,9 +182,7 @@
                     tbodyStudy.append(series_E);
                 }
             }
-
             self._bindEvent();
-
         },
 
         /////////////////////////////////////////////////////////////////////////
@@ -228,14 +192,20 @@
             var trStudy = element.closest("tr");
             var trSeries = trStudy.next("tr");
             var studyUid = trStudy.attr("data-study-uid");
-            trStudy.remove();
-            trSeries.remove();
+            trStudy.fadeOut(600, function () {
+                trStudy.remove();
+            });
+            trSeries.fadeOut(600, function () {
+                trSeries.remove();
+            });
             delete self._studies[studyUid];
             delete self._dictionaryStateOfCollapse[studyUid];
             if (Object.keys(self._studies).length === 0) {
-                self.element.find(".tc-wrapper").hide();
+                self.element.find(".tc-wrapper").fadeOut(600);
             }
         },
+
+        /////////////////////////////////////////////////////////////////////////
 
         _delete_series_bind: function (element) {
             var self = this;
@@ -243,22 +213,46 @@
             var studyUid = trSeries.attr("for-data-study-uid");
             var seriesNumber = trSeries.attr("data-series-number");
             var trStudy = $("tr[data-study-uid='" + studyUid + "']");
-            trSeries.remove();
+            trSeries.fadeOut(600, function () {
+                trSeries.remove();
+            });
             delete self._studies[studyUid].series[seriesNumber];
             if (Object.keys(self._studies[studyUid].series).length === 0) {
                 delete self._studies[studyUid];
                 delete self._dictionaryStateOfCollapse[studyUid];
-                trStudy.next("tr").remove();
-                trStudy.remove();
+                trStudy.next("tr").fadeOut(600, function () {
+                    trStudy.next("tr").remove();
+                });
+                trStudy.fadeOut(600, function () {
+                    trStudy.remove();
+                });
                 if (Object.keys(self._studies).length === 0) {
-                    self.element.find(".tc-wrapper").hide();
+                    self.element.find(".tc-wrapper").fadeOut(600);
                 }
             }
         },
 
+        /////////////////////////////////////////////////////////////////////////
+
+        _uploadAll_bind: function () {
+            self.element.find(".tc-upload-study").each(function () {
+                $(this).trigger("click");
+            });
+        },
+
+        /////////////////////////////////////////////////////////////////////////
+
         _bindEvent: function () {
             var self = this;
             ///////////////////////////////////////
+
+            self.element.find("#uploadAll").click(function () {
+                self.element.find(".tc-upload-study").each(function () {
+                    $(this).trigger("click");
+                });
+            });
+
+
 
             self.element.find(".tc-collapse").each(function () {
                 var that = $(this);
@@ -285,33 +279,27 @@
                 });
             });
 
-
             self.element.find(".tc-upload-study").each(function () {
                 var that = $(this);
                 var trStudy = that.closest("tr");
                 var studyUid = trStudy.attr("data-study-uid");
                 var cancelBtn = that.siblings(".tc-cancel-study");
-
                 var deleteStudyBtns = that.siblings(".tc-delete-study");
                 var deleteSeriesBtns = trStudy.next("tr").find(".tc-delete-series");
-
                 that.click(function () {
                     self._studiesUploading[studyUid] = true;
                     self._checkAvailabilityStatusAddingFiles();
                     that.hide();
                     cancelBtn.show();
                     trStudy.find(".tc-progress-uploading").show();
-
                     deleteStudyBtns.each(function () {
                         $(this).unbind('click');
-                        $(this).addClass("not-allowed");
+                        $(this).addClass("tc-not-allowed");
                     });
                     deleteSeriesBtns.each(function () {
                         $(this).unbind('click');
-                        $(this).addClass("not-allowed");
+                        $(this).addClass("tc-not-allowed");
                     });
-
-
                     var series = self._studies[studyUid].series;
                     var files = [];
                     for (let seriesId in series) {
@@ -319,7 +307,6 @@
                             files = files.concat(series[seriesId].files);
                         }
                     }
-
                     var typeSubmitData =
                     {
                         Name: "TypeOfSubmit",
@@ -334,28 +321,24 @@
                     self._checkAvailabilityStatusAddingFiles();
                     that.show();
                     cancelBtn.hide();
-
                     deleteStudyBtns.each(function () {
                         var btn = $(this);
                         btn.click(function () {
                             self._delete_study_bind(btn);
                         });
-                        btn.removeClass("not-allowed");
+                        btn.removeClass("tc-not-allowed");
                     });
                     deleteSeriesBtns.each(function () {
                         var btn = $(this);
                         btn.click(function () {
                             self._delete_series_bind(btn);
                         });
-                        btn.removeClass("not-allowed");
+                        btn.removeClass("tc-not-allowed");
                     });
-
                     var listOfFilesId = trStudy.attr("data-listOfFilesId");
                     self._service.cancelUploadAndSubmitListOfFiles(listOfFilesId, uploadHandler);
                     trStudy.find(".tc-progress-uploading").hide();
-
                 });
-
 
                 function uploadHandler(result) {
                     trStudy.attr("data-listOfFilesId", result.listOfFilesId);
@@ -380,34 +363,44 @@
                         delete self._studiesUploading[studyUid];
                         self._checkAvailabilityStatusAddingFiles();
                         var trSeries = trStudy.next("tr");
-
                         trStudy.fadeOut(600, function () {
                             trStudy.remove();
                         });
                         trSeries.fadeOut(600, function () {
                             trSeries.remove();
                         });
-
                         delete self._studies[studyUid];
                         delete self._dictionaryStateOfCollapse[studyUid];
                         if (Object.keys(self._studies).length === 0) {
-                            self.element.find(".tc-wrapper").hide();
+                            self.element.find(".tc-wrapper").fadeOut(600);
                         }
                     }
                 }
             });
-
-
         },
-        ///////////////////////////////////////
 
+        /////////////////////////////////////////////////////////////////////////
 
+        _checkAvailabilityStatusAddingFiles: function () {
+            let self = this;
+            var uploadAllBtn = self.element.find("#uploadAll");
+            if (Object.keys(self._studiesUploading).length === 0) {
+                self.options.setAvailabilityStatusAddingFiles(true);
+                uploadAllBtn.prop("disabled", false);
+                uploadAllBtn.removeClass("tc-not-allowed");
+                uploadAllBtn.click(function () {
+                    self.element.find(".tc-upload-study").each(function () {
+                        $(this).trigger("click");
+                    });
+                });
 
-        ///////////////////////////////////////
-
-
-        ///////////////////////////////////////
-
+            } else {
+                self.options.setAvailabilityStatusAddingFiles(false);
+                uploadAllBtn.prop("disabled", true);
+                uploadAllBtn.unbind('click');
+                uploadAllBtn.addClass("tc-not-allowed");
+            }
+        },
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -418,6 +411,8 @@
             }
             return result;
         },
+
+        /////////////////////////////////////////////////////////////////////////
 
         _getSizeOfListFiles: function (list) {
             let size = 0;
@@ -472,7 +467,6 @@
                             studyTime: instance_get_attributeValue(instance, 0x80030),
                             patientName: instance_get_attributeValue(instance, 0x100010),
                             studyInstanceUid: instance_get_attributeValue(instance, 0x20000D),
-
                             studyId: instance_get_attributeValue(instance, 0x200010),
                             seriesDescription: instance_get_attributeValue(instance, 0x8103E),
                             modality: instance_get_attributeValue(instance, 0x80060),
@@ -495,10 +489,8 @@
             } else {
                 reader.readAsArrayBuffer(file);
             }
-
             return deferred.promise();
         },
-
 
         /////////////////////////////////////////////////////////////////////////
 
@@ -527,6 +519,8 @@
                 "</tr></thead>" +
                 "<tbody></tbody>" +
                 "</table>" +
+                "<button type='button' id='uploadAll' class='tc-btn'>" +
+                "<span class='tc-btn-icon'></span>Upload All</button>" +
                 "</div>",
 
         _series_T:
@@ -549,8 +543,6 @@
         _progressBar_T:
             "<div class='tc-progress-bar' style='display: none;'>" +
                 "<span></span>" +
-                "</div>",
-
-        _dictionaryStateOfCollapse: {}
+                "</div>"
     });
 })(jQuery, window, document);

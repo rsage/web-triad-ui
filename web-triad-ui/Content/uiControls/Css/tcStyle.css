@@ -1,5 +1,21 @@
-﻿body {
-    font-family: Arial, sans-serif;
+﻿@font-face {
+    font-family: "MyriadProRegular";
+    src: url("../Fonts/MyriadProRegular/MyriadProRegular.eot");
+    src: url("../Fonts/MyriadProRegular/MyriadProRegular.eot?#iefix")format("embedded-opentype"),
+    url("../Fonts/MyriadProRegular/MyriadProRegular.woff") format("woff"),
+    url("../Fonts/MyriadProRegular/MyriadProRegular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "MyriadProSemiBold";
+    src: url("../Fonts/MyriadProSemiBold/MyriadProSemiBold.eot");
+    src: url("../Fonts/MyriadProSemiBold/MyriadProSemiBold.eot?#iefix")format("embedded-opentype"),
+    url("../Fonts/MyriadProSemiBold/MyriadProSemiBold.woff") format("woff"),
+    url("../Fonts/MyriadProSemiBold/MyriadProSemiBold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
 }
 
 .tc-loader {
@@ -86,7 +102,7 @@
 
 .tc-table-study > caption {
     text-align: left;
-    font-weight: bold;
+    font-family: MyriadProSemiBold;
     background-color: #73a0af;
     color: white;
     padding-left: 10px;
@@ -97,13 +113,16 @@
 
 .tc-table-study > thead {
     background-color: #999999;
+    font-family: MyriadProSemiBold;
     text-align: left;
     color: white;
     line-height: 1.3;  
+    font-size: 12px
 }
 
 .tc-table-study > tbody{
-    color: #666666
+    color: #666666;
+    font-family: MyriadProRegular;
 }
 
 .tc-table-study > tbody > tr {
@@ -136,21 +155,22 @@
 .tc-table-series {
     width: calc(100% - 30px);
     border: none;
-    font-size: 12px;
+    font-size: 12px;    
     margin-left: 30px;
     border-collapse: collapse;
 }
 
 .tc-table-series > thead {
     background-color: #e6e6e6;
+    font-family: MyriadProSemiBold;
     text-align: left;
     color: #4d4d4d;
     line-height: 1.5;
-  
 }
 
 .tc-table-series > tbody {
-    color: #666666
+    color: #666666;
+    font-family: MyriadProRegular;
 }
 
 .tc-table-series > tbody > tr {
@@ -250,13 +270,14 @@ span.tc-delete-series {
 .tc-table-parsingPanel > thead {
     background-color: #deecd4;
     line-height: 1.3;
-    font-weight: bold;
+    font-family: MyriadProSemiBold;
     white-space: nowrap;
 }
 
 .tc-table-parsingPanel > tbody {
     background-color: #e6e6e6;  
-    line-height: 2.6; 
+    line-height: 2.6;
+    font-family: MyriadProRegular;
 }
 
 .tc-table-parsingPanel td,

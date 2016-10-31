@@ -116,6 +116,14 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Default\ReviewControl.cshtml" />
     <Content Include="Views\Default\UploadControl.cshtml" />
+    <Content Include="Content\uiControls\Fonts\MyriadProRegular\MyriadProRegular.eot" />
+    <Content Include="Content\uiControls\Fonts\MyriadProRegular\MyriadProRegular.otf" />
+    <Content Include="Content\uiControls\Fonts\MyriadProRegular\MyriadProRegular.ttf" />
+    <Content Include="Content\uiControls\Fonts\MyriadProRegular\MyriadProRegular.woff" />
+    <Content Include="Content\uiControls\Fonts\MyriadProSemiBold\MyriadProSemiBold.eot" />
+    <Content Include="Content\uiControls\Fonts\MyriadProSemiBold\MyriadProSemiBold.otf" />
+    <Content Include="Content\uiControls\Fonts\MyriadProSemiBold\MyriadProSemiBold.ttf" />
+    <Content Include="Content\uiControls\Fonts\MyriadProSemiBold\MyriadProSemiBold.woff" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
